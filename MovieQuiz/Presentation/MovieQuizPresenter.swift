@@ -39,17 +39,13 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
         }
     }
     
-    func isLastQuestion() -> Bool {
-        currentQuestionIndex == questionsAmount - 1
-    }
-    
     func restartGame() {
         currentQuestionIndex = 0
         correctAnswers = 0
         questionFactory?.requestNextQuestion()
     }
     
-    func switchToNextQuestion() {
+    private func switchToNextQuestion() {
         currentQuestionIndex += 1
     }
     
@@ -70,7 +66,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     private func didAnswer(isYes: Bool) {
-        guard let currentQuestion = currentQuestion else { return }
+        guard let currentQuestion else { return }
         let givenAnswer = isYes
         proceedWithAnswer(isCorrect: givenAnswer == currentQuestion.correctAnswer)
     }
@@ -89,7 +85,7 @@ final class MovieQuizPresenter: QuestionFactoryDelegate {
     }
     
     private func proceedToNextQuestionOrResults() {
-        if isLastQuestion() {
+        if currentQuestionIndex == questionsAmount - 1 {
             let text = makeResultsMessage()
             let viewModel = QuizResultsViewModel(
                 title: "Этот раунд окончен!",

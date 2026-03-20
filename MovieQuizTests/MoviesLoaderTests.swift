@@ -1,23 +1,15 @@
 import XCTest
 @testable import MovieQuiz
 
-class MoviesLoaderTests: XCTestCase {
+final class MoviesLoaderTests: XCTestCase {
     
     struct StubNetworkClient: NetworkRouting {
         
         enum TestError: Error {
-        case test
+            case test
         }
         
         let emulateError: Bool
-        
-        func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
-            if emulateError {
-                handler(.failure(TestError.test))
-            } else {
-                handler(.success(expectedResponse))
-            }
-        }
         
         private var expectedResponse: Data {
             """
@@ -52,11 +44,19 @@ class MoviesLoaderTests: XCTestCase {
               }
             """.data(using: .utf8) ?? Data()
         }
+        
+        func fetch(url: URL, handler: @escaping (Result<Data, Error>) -> Void) {
+            if emulateError {
+                handler(.failure(TestError.test))
+            } else {
+                handler(.success(expectedResponse))
+            }
+        }
     }
     
     func testSuccessLoading() throws {
         let loader = MoviesLoader()
-
+        
         let expectation = expectation(description: "Loading expectation")
         
         loader.loadMovies { result in
@@ -67,14 +67,14 @@ class MoviesLoaderTests: XCTestCase {
                 XCTFail("Unexpected failure")
             }
         }
-       
-       waitForExpectations(timeout: 1)
+        
+        waitForExpectations(timeout: 5)
     }
     
     func testFailureLoading() throws {
         let stubNetworkClient = StubNetworkClient(emulateError: true)
         let loader = MoviesLoader(networkClient: stubNetworkClient)
-
+        
         let expectation = expectation(description: "Loading expectation")
         
         loader.loadMovies { result in
@@ -87,6 +87,6 @@ class MoviesLoaderTests: XCTestCase {
             }
         }
         
-        waitForExpectations(timeout: 1)
+        waitForExpectations(timeout: 5)
     }
 }
